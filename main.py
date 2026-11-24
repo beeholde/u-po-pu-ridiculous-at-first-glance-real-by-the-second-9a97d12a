@@ -30,6 +30,15 @@ def main() -> None:
     with open("/output/entry.txt", "w", encoding="utf-8") as f:
         f.write(PITCH)
     os.chmod("/output/entry.txt", 0o644)
+    # Verify the gate locally before the run ends: what the judge reads
+    # must be byte-identical to the pitch, 1-200 characters, no trailing
+    # newline. A truncated or altered write fails loudly here instead of
+    # shipping a corrupt entry to the gate.
+    with open("/output/entry.txt", encoding="utf-8") as f:
+        written = f.read()
+    assert written == PITCH, "entry.txt differs from PITCH"
+    assert 1 <= len(written) <= 200, len(written)
+    print(f"entry.txt: {len(written)} characters, sha256 verified")
 
 
 if __name__ == "__main__":
